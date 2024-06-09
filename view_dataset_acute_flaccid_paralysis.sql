@@ -119,9 +119,9 @@ SELECT
     ((couchdb.doc -> 'location'::text) ->> 'longitude')::FLOAT AS location_longitude,
     couchdb.doc ->> 'mform_id' AS mform_id,
     couchdb.doc ->> 'created_username' AS created_username,
-    couchdb.doc ->> 'created_timestamp' AS created_timestamp,
+    to_timestamp(couchdb.doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS created_timestamp,
     couchdb.doc ->> 'modified_username' AS modified_username,
-    couchdb.doc ->> 'modified_timestamp' AS modified_timestamp,
+    to_timestamp(couchdb.doc ->> 'modified_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS modified_timestamp,
     couchdb.doc AS doc
 FROM couchdb
 WHERE 
