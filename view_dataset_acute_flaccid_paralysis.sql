@@ -1,3 +1,4 @@
+DROP VIEW view_dataset_acute_flaccid_paralysis;
 CREATE VIEW view_dataset_acute_flaccid_paralysis AS
 SELECT 
     (couchdb.doc ->> 'ident')::BIGINT AS case_unique_id,
