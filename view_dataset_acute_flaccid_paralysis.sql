@@ -11,6 +11,18 @@ SELECT
     (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'date_of_birth'::text ->> 'df_value')::text AS case_date_of_birth,
     (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float AS case_age_years,
     (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_months'::text ->> 'df_value')::float AS case_age_months,
+    CASE
+        WHEN (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 0 AND 5 THEN '0-5 years'
+        WHEN (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 5.1 AND 17 THEN '5-17 years'
+        WHEN (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 17.1 AND 50 THEN '18-50 years'
+        WHEN (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float > 50 THEN '51+ years'
+        ELSE 'Unknown'
+    END AS age_group,
+    CASE
+        WHEN lower((((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'gender'::text ->> 'df_value')) = 'male' THEN 'Male'
+        WHEN lower((((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'gender'::text ->> 'df_value')) = 'female' THEN 'Female'
+        ELSE 'Unknown'
+    END as gender,
     (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'phone_number'::text ->> 'df_value') AS case_phone_number,
     (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'occupation'::text ->> 'df_value') AS case_occupation,
     (((couchdb.doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'occupation_other'::text ->> 'df_value') AS case_occupation_other,
