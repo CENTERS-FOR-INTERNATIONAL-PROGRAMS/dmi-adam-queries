@@ -6,6 +6,18 @@ SELECT
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'gender'::text) ->> 'df_value'::text AS case_gender,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'age_years'::text) ->> 'df_value'::text::int AS case_age_in_years,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'age_months'::text) ->> 'df_value'::text::int AS case_age_in_months,
+    CASE
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 0 AND 5 THEN '0-5 years'
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 5.1 AND 17 THEN '5-17 years'
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 17.1 AND 50 THEN '18-50 years'
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float > 50 THEN '51+ years'
+        ELSE 'Unknown'
+    END AS age_group,
+    CASE
+        WHEN lower((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'gender'::text ->> 'df_value')) = 'male' THEN 'Male'
+        WHEN lower((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'gender'::text ->> 'df_value')) = 'female' THEN 'Female'
+        ELSE 'Unknown'
+    END as gender,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'country'::text) ->> 'df_value'::text AS case_residential_country,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'county'::text) ->> 'df_value'::text AS case_residential_county,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'subcounty'::text) ->> 'df_value'::text AS case_residential_subcounty,
