@@ -1,12 +1,25 @@
+DROP VIEW IF EXISTS view_dataset_viral_hemorrhagic_fever;
 CREATE VIEW view_dataset_viral_hemorrhagic_fever AS
 SELECT 
     doc ->> 'ident'::text AS case_unique_id,
     doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'given'->> 'df_value'::text AS case_given_name,
     doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'family'->> 'df_value'::text AS case_family_name,
     doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'gender'->> 'df_value'::text AS case_gender,
-    doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'date_of_birth'->> 'df_value'::date AS case_date_of_birth,
-    doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'age_years'->> 'df_value'::integer AS case_age_years,
-    doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'age_months'->> 'df_value'::integer AS case_age_months,
+    doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'date_of_birth'->> 'df_value'::text AS case_date_of_birth,
+    doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'age_years'->> 'df_value'::text AS case_age_years,
+    doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'age_months'->> 'df_value'::text AS case_age_months,
+    CASE
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 0 AND 5 THEN '0-5 years'
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 5.1 AND 17 THEN '5-17 years'
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 17.1 AND 50 THEN '18-50 years'
+        WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float > 50 THEN '51+ years'
+        ELSE 'Unknown'
+    END AS age_group,
+    CASE
+        WHEN lower((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'gender'::text ->> 'df_value')) = 'male' THEN 'Male'
+        WHEN lower((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'gender'::text ->> 'df_value')) = 'female' THEN 'Female'
+        ELSE 'Unknown'
+    END as gender,
     doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'country'->> 'df_value'::text AS case_country,
     doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'county'->> 'df_value'::text AS case_county,
     doc -> 'DForms'-> 'case_demographics'-> 0-> 'DFields'-> 'values'-> 'subcounty'->> 'df_value'::text AS case_subcounty,
@@ -30,29 +43,29 @@ SELECT
     doc -> 'DForms'-> 'case_contact'-> 0-> 'DFields'-> 'values'-> 'surname'->> 'df_value'::text AS contact_surname,
     doc -> 'DForms'-> 'case_contact'-> 0-> 'DFields'-> 'values'-> 'given_name'->> 'df_value'::text AS contact_given_name,
     doc -> 'DForms'-> 'case_contact'-> 0-> 'DFields'-> 'values'-> 'gender'->> 'df_value'::text AS contact_gender,
-    doc -> 'DForms'-> 'case_contact'-> 0-> 'DFields'-> 'values'-> 'age'->> 'df_value'::integer AS contact_age,
+    doc -> 'DForms'-> 'case_contact'-> 0-> 'DFields'-> 'values'-> 'age'->> 'df_value'::text AS contact_age,
     doc -> 'DForms'-> 'case_outcome'-> 0-> 'DFields'-> 'values'-> 'final_case_classification'->> 'df_value'::text AS outcome_final_case_classification,
     doc -> 'DForms'-> 'case_outcome'-> 0-> 'DFields'-> 'values'-> 'final_patient_status'->> 'df_value'::text AS outcome_final_patient_status,
     doc -> 'DForms'-> 'case_outcome'-> 0-> 'DFields'-> 'values'-> 'final_patient_status_other'->> 'df_value'::text AS outcome_final_patient_status_other,
     doc -> 'DForms'-> 'case_outcome'-> 0-> 'DFields'-> 'values'-> 'reason_for_referral'->> 'df_value'::text AS outcome_reason_for_referral,
-    doc -> 'DForms'-> 'case_outcome'-> 0-> 'DFields'-> 'values'-> 'date_of_outcome'->> 'df_value'::date AS outcome_date_of_outcome,
+    doc -> 'DForms'-> 'case_outcome'-> 0-> 'DFields'-> 'values'-> 'date_of_outcome'->> 'df_value'::text AS outcome_date_of_outcome,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'record_exposure'->> 'df_value'::text AS exposure_record_exposure,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'exposure_type'->> 'df_value'::text AS exposure_exposure_type,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_name'->> 'df_value'::text AS exposure_food_name,
-    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_consumption_date'->> 'df_value'::date AS exposure_food_consumption_date,
+    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_consumption_date'->> 'df_value'::text AS exposure_food_consumption_date,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_source'->> 'df_value'::text AS exposure_food_source,
-    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_participants_count'->> 'df_value'::integer AS exposure_food_participants_count,
-    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_affected_participants_count'->> 'df_value'::integer AS exposure_food_affected_participants_count,
+    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_participants_count'->> 'df_value'::text AS exposure_food_participants_count,
+    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'food_affected_participants_count'->> 'df_value'::text AS exposure_food_affected_participants_count,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'water_sources'->> 'df_value'::text AS exposure_water_sources,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'water_sources_other'->> 'df_value'::text AS exposure_water_sources_other,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'toilet_types'->> 'df_value'::text AS exposure_toilet_types,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'toilet_types_other'->> 'df_value'::text AS exposure_toilet_types_other,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_origin_country'->> 'df_value'::text AS exposure_travel_origin_country,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_origin_city'->> 'df_value'::text AS exposure_travel_origin_city,
-    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_departure_date'->> 'df_value'::date AS exposure_travel_departure_date,
+    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_departure_date'->> 'df_value'::text AS exposure_travel_departure_date,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_destination_country'->> 'df_value'::text AS exposure_travel_destination_country,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_destination_city'->> 'df_value'::text AS exposure_travel_destination_city,
-    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_arrival_date'->> 'df_value'::date AS exposure_travel_arrival_date,
+    doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'travel_arrival_date'->> 'df_value'::text AS exposure_travel_arrival_date,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'animal_exposure'->> 'df_value'::text AS exposure_animal_exposure,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'animal_exposure_other'->> 'df_value'::text AS exposure_animal_exposure_other,
     doc -> 'DForms'-> 'case_exposure'-> 0-> 'DFields'-> 'values'-> 'animal_species'->> 'df_value'::text AS exposure_animal_species,
@@ -68,46 +81,52 @@ SELECT
     doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'case_seen_at_facility'->> 'df_value'::text AS case_seen_at_facility,
     doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'admitted'->> 'df_value'::text AS admitted,
     doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'health_facility_name'->> 'df_value'::text AS health_facility_name,
-    doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'admission_date'->> 'df_value'::date AS admission_date,
+    doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'admission_date'->> 'df_value'::text AS admission_date,
     doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'inpatient_number'->> 'df_value'::text AS inpatient_number,
-    doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'discharge_date'->> 'df_value'::date AS discharge_date,
+    doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'discharge_date'->> 'df_value'::text AS discharge_date,
     doc -> 'DForms'-> 'case_hospitalization'-> 0-> 'DFields'-> 'values'-> 'patient_status'->> 'df_value'::text AS patient_status,
     doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'laboratory_sample_collected'->> 'df_value'::text AS laboratory_sample_collected,
     doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'laboratory_samples_collected'->> 'df_value'::text AS laboratory_samples_collected,
     doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'laboratory_samples_collected_others'->> 'df_value'::text AS laboratory_samples_collected_others,
-    doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'sample_date'->> 'df_value'::date AS sample_date,
+    doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'sample_date'->> 'df_value'::text AS sample_date,
     doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'rdt_done'->> 'df_value'::text AS rdt_done,
     doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'rdt_results'->> 'df_value'::text AS rdt_results,
     doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'samples_sent_to_laboratory'->> 'df_value'::text AS samples_sent_to_laboratory,
     doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'laboratory_name'->> 'df_value'::text AS laboratory_name,
-    doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'sample_sent_to_lab_date'->> 'df_value'::date AS sample_sent_to_lab_date,
+    doc -> 'DForms'-> 'case_lab_information'-> 0-> 'DFields'-> 'values'-> 'sample_sent_to_lab_date'->> 'df_value'::text AS sample_sent_to_lab_date,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'symptoms'->> 'df_value'::text AS symptoms,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'symptoms_other'->> 'df_value'::text AS symptoms_other,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'symptoms_unexplained_bleeding'->> 'df_value'::text AS symptoms_unexplained_bleeding,
-    doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'symptoms_start_date'->> 'df_value'::date AS symptoms_start_date,
+    doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'symptoms_start_date'->> 'df_value'::text AS symptoms_start_date,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'title_symptoms_start_location'->> 'df_value'::text AS title_symptoms_start_location,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'symptoms_start_county'->> 'df_value'::text AS symptoms_start_county,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'symptoms_start_subcounty'->> 'df_value'::text AS symptoms_start_subcounty,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'City / Town / Village / Camp'->> 'df_value'::text AS symptoms_start_city_town_village_camp,
     doc -> 'DForms'-> 'clinical_information_vhf'-> 0-> 'DFields'-> 'values'-> 'outcome'->> 'df_value'::text AS outcome,
-    doc -> 'DFields'-> 'values'-> 'syndrome'->> 'df_value'::text AS syndrome,
-    doc -> 'DFields'-> 'values'-> 'disease'->> 'df_value'::text AS disease,
-    doc -> 'DFields'-> 'values'-> 'EPID'->> 'df_value'::text AS epid,
-    doc -> 'DFields'-> 'values'-> 'date_of_investigation'->> 'df_value'::date AS date_of_investigation,
-    doc ->> 'fform_id'::text AS fform_id,
-    (doc -> 'location'->> 'accuracy')::integer AS location_accuracy,
-    (doc -> 'location'->> 'latitude')::decimal AS location_latitude,
-    (doc -> 'location'->> 'longitude')::decimal AS location_longitude,
-    doc ->> 'mform_id'::text AS mform_id,
-    doc ->> 'created_username'::text AS created_username,
-    doc ->> 'created_timestamp'::timestamp AS created_timestamp,
-    doc ->> 'modified_username'::text AS modified_username,
-    doc ->> 'modified_timestamp'::timestamp AS modified_timestamp
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'date_of_investigation'::text ->> 'df_value')::text AS case_investigation_date,
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'EPID'::text ->> 'df_value') AS epid,
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'disease'::text ->> 'df_value') AS disease,
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'syndrome'::text ->> 'df_value') AS syndrome,
+    doc ->> 'fform_id' AS fform_id,
+    ((doc -> 'location'::text) ->> 'accuracy')::float AS location_accuracy,
+    ((doc -> 'location'::text) ->> 'latitude')::float AS location_latitude,
+    ((doc -> 'location'::text) ->> 'longitude')::float AS location_longitude,
+    doc ->> 'mform_id' AS mform_id,
+    doc ->> 'created_username' AS created_username,
+    to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS created_timestamp,
+    doc ->> 'modified_username' AS modified_username,
+    to_timestamp(doc ->> 'modified_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS modified_timestamp,
+    date_part('week', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_week,
+    date_part('day', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_day,
+    date_part('month', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_month,
+    date_part('year', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_year,
+    to_char(to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS'), 'YYYY "W"IW') AS case_year_week,
+    doc
 FROM couchdb
 WHERE 
-    (doc ->> 'type'::text) = 'dform'::text AND 
-    (doc -> 'DFields'-> 'values'-> 'syndrome'->> 'df_value'::text) = 'VHF'::text AND 
-    (doc -> 'ident'::text) IS NOT NULL;
+    (doc ->> 'type') = 'dform'
+    AND (doc -> 'DFields'::text -> 'values'::text -> 'syndrome'::text ->> 'df_value') = 'VHF'
+    AND (doc ->> 'ident') IS NOT NULL;
 
-alter table view_dataset_viral_hemorrhagic_fever
-owner to postgres; 
+ALTER TABLE view_dataset_viral_hemorrhagic_fever
+    OWNER TO postgres_root;
