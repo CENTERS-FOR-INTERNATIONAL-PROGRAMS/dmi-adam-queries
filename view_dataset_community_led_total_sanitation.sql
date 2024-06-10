@@ -7,6 +7,7 @@ SELECT
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'commuity_unit'::text) ->> 'df_value')::text) AS commuity_unit,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'location_name'::text) ->> 'df_value')::text) AS location_name,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'ward_name'::text) ->> 'df_value')::text) AS ward_name,
+    (((((doc -> 'DFields'::text) -> 'values'::text) -> 'subcounty'::text) ->> 'df_value')::text) AS subcounty,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'clts_triggering_date'::text) ->> 'df_value')::date) AS clts_triggering_date,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'clts_hcw_name'::text) ->> 'df_value')::text) AS clts_hcw_name,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'clts_hcw_contact'::text) ->> 'df_value')::text) AS clts_hcw_contact,
@@ -30,13 +31,13 @@ SELECT
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'clts_followup_latrine_construction_date'::text) ->> 'df_value')::date) AS clts_followup_latrine_construction_date,
     doc ->> 'fform_id' AS form_id,
     (doc -> 'location' ->> 'accuracy')::float AS location_accuracy,
-    (doc -> 'location' ->> 'latitude')::DOUBLE PRECISION AS location_latitude,
-    (doc -> 'location' ->> 'longitude')::DOUBLE PRECISION AS location_longitude,
+    (doc -> 'location' ->> 'latitude')::float AS location_latitude,
+    (doc -> 'location' ->> 'longitude')::float AS location_longitude,
     doc ->> 'mform_id' AS mform_id,
     doc ->> 'created_username' AS created_username,
-    doc ->> 'created_timestamp' AS created_timestamp,
+    to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS created_timestamp,
     doc ->> 'modified_username' AS modified_username,
-    doc ->> 'modified_timestamp' AS modified_timestamp,
+    to_timestamp(doc ->> 'modified_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS modified_timestamp,
     doc
 FROM couchdb
 WHERE (doc ->> 'type'::text) = 'dform'::text
