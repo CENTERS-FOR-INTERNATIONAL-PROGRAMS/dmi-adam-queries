@@ -1,3 +1,4 @@
+DROP VIEW IF EXISTS view_dataset_diarrhoeal_disease;
 CREATE VIEW view_dataset_diarrhoeal_disease AS
 SELECT
     doc -> 'ident'::text AS case_unique_id,
