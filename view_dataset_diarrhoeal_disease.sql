@@ -1,12 +1,12 @@
 DROP VIEW IF EXISTS view_dataset_diarrhoeal_disease;
 CREATE VIEW view_dataset_diarrhoeal_disease AS
 SELECT
-    doc -> 'ident'::text AS case_unique_id,
+    (doc ->> 'ident')::bigint AS case_unique_id,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'given'::text) ->> 'df_value'::text AS case_given_name,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'family'::text) ->> 'df_value'::text AS case_family_name,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'gender'::text) ->> 'df_value'::text AS case_gender,
-    ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'age_years'::text) ->> 'df_value'::text::float AS case_age_in_years,
-    ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'age_months'::text) ->> 'df_value'::text::float AS case_age_in_months,
+    (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float AS case_age_in_years,
+    (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_months'::text ->> 'df_value')::float AS case_age_in_months,
     CASE
         WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 0 AND 5 THEN '0-5 years'
         WHEN (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'age_years'::text ->> 'df_value')::float BETWEEN 5.1 AND 17 THEN '5-17 years'
@@ -48,8 +48,8 @@ SELECT
     (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'food_name'::text ->> 'df_value'::text AS food_name,
     (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'food_consumption_date'::text ->> 'df_value'::text AS food_consumption_date,
     (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'food_source'::text ->> 'df_value'::text AS food_source,
-    (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'food_participants_count'::text ->> 'df_value'::text::float AS food_participants_count,
-    (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'food_affected_participants_count'::text ->> 'df_value'::text::float AS food_affected_participants_count,
+    (((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'food_participants_count'::text ->> 'df_value')::float AS food_participants_count,
+    (((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'food_affected_participants_count'::text ->> 'df_value')::float AS food_affected_participants_count,
     (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'water_sources'::text ->> 'df_value'::text AS water_sources,
     (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'water_sources_other'::text ->> 'df_value'::text AS water_sources_other,
     (((((doc -> 'DForms'::text) -> 'case_exposure'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'toilet_types'::text ->> 'df_value'::text AS toilet_types,
@@ -82,7 +82,7 @@ SELECT
     (((((doc -> 'DForms'::text) -> 'case_lab_information'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'laboratory_samples_collected'::text ->> 'df_value'::text AS laboratory_samples_collected,
     (((((doc -> 'DForms'::text) -> 'case_lab_information'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'laboratory_samples_collected_others'::text ->> 'df_value'::text AS laboratory_samples_collected_others,    
     (((((doc -> 'DForms'::text) -> 'vaccination_diarrhoeal_disease'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'vaccinated'::text ->> 'df_value'::text AS vaccinated,
-    (((((doc -> 'DForms'::text) -> 'vaccination_diarrhoeal_disease'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'vaccine_doses'::text ->> 'df_value'::text::float AS vaccine_doses,
+    (((doc -> 'DForms'::text) -> 'vaccination_diarrhoeal_disease'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'vaccine_doses'::text ->> 'df_value')::float AS vaccine_doses,
     (((((doc -> 'DForms'::text) -> 'vaccination_diarrhoeal_disease'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'vaccination_date'::text ->> 'df_value'::text AS vaccination_date,
     (((((doc -> 'DForms'::text) -> 'clinical_information_diarrhoeal_diseases'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'date_of_onset'::text ->> 'df_value'::text AS date_of_onset,
     (((((doc -> 'DForms'::text) -> 'clinical_information_diarrhoeal_diseases'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'symptoms'::text ->> 'df_value'::text AS symptoms,
@@ -92,9 +92,9 @@ SELECT
     (((doc -> 'DFields'::text) -> 'values'::text) -> 'EPID'::text) ->> 'df_value'::text AS epid,
     (((doc -> 'DFields'::text) -> 'values'::text) -> 'date_of_investigation'::text) ->> 'df_value'::text AS date_of_investigation,
     doc ->> 'fform_id' AS form_id,
-    (doc -> 'location'::text) ->> 'accuracy'::text::float AS location_accuracy,
-    (doc -> 'location'::text) ->> 'latitude'::text::float AS location_latitude,
-    (doc -> 'location'::text) ->> 'longitude'::text::float AS location_longitude,
+    ((doc -> 'location'::text) ->> 'accuracy')::float AS location_accuracy,
+    ((doc -> 'location'::text) ->> 'latitude')::float AS location_latitude,
+    ((doc -> 'location'::text) ->> 'longitude')::float AS location_longitude,
     doc ->> 'mform_id' AS mform_id,
     doc ->> 'created_username' AS created_username,
     to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS created_timestamp,
