@@ -1,0 +1,62 @@
+DROP VIEW IF EXISTS view_dataset_sampling_form_for_fortified_foods;
+CREATE VIEW view_dataset_sampling_form_for_fortified_foods AS
+SELECT
+    (doc ->> 'ident')::text AS case_unique_id,
+    (doc -> 'DFields' -> 'values' -> 'sffff_sample_id' ->> 'df_value')::text AS sffff_sample_id,
+    (doc -> 'DFields' -> 'values' -> 'sfff_iron' ->> 'df_value')::text AS sfff_iron,
+    (doc -> 'DFields' -> 'values' -> 'sffff_zinc' ->> 'df_value')::text AS sffff_zinc,
+    (doc -> 'DFields' -> 'values' -> 'sffff_iodine' ->> 'df_value')::text AS sffff_iodine,
+    (doc -> 'DFields' -> 'values' -> 'sffff_vitamin_a' ->> 'df_value')::text AS sffff_vitamin_a,
+    (doc -> 'DFields' -> 'values' -> 'sffff_sampling_site' ->> 'df_value')::text AS sffff_sampling_site,
+    (doc -> 'DFields' -> 'values' -> 'sffff_packaging_size' ->> 'df_value')::text AS sffff_packaging_size,
+    (doc -> 'DFields' -> 'values' -> 'sffff_type_of_package' ->> 'df_value')::text AS sffff_type_of_package,
+    (doc -> 'DFields' -> 'values' -> 'sffff_batch_lot_number' ->> 'df_value')::text AS sffff_batch_lot_number,
+    (doc -> 'DFields' -> 'values' -> 'sffff_storage_condition' ->> 'df_value')::text AS sffff_storage_condition,
+    (doc -> 'DFields' -> 'values' -> 'sffff_additional_remarks' ->> 'df_value')::text AS sffff_additional_remarks,
+    (doc -> 'DFields' -> 'values' -> 'sffff_date_of_manufacture' ->> 'df_value')::date AS sffff_date_of_manufacture,
+    (doc -> 'DFields' -> 'values' -> 'sffff_reason_for_sampling' ->> 'df_value')::text AS sffff_reason_for_sampling,
+    (doc -> 'DFields' -> 'values' -> 'sffff_size_of_lot_sampled' ->> 'df_value')::text AS sffff_size_of_lot_sampled,
+    (doc -> 'DFields' -> 'values' -> 'sffff_labeled_as_fortified' ->> 'df_value')::text AS sffff_labeled_as_fortified,
+    (doc -> 'DFields' -> 'values' -> 'sffff_method_of_collection' ->> 'df_value')::text AS sffff_method_of_collection,
+    (doc -> 'DFields' -> 'values' -> 'sffff_type_of_food_vehicle' ->> 'df_value')::text AS sffff_type_of_food_vehicle,
+    (doc -> 'DFields' -> 'values' -> 'sffff_sample_collector_name' ->> 'df_value')::text AS sffff_sample_collector_name,
+    (doc -> 'DFields' -> 'values' -> 'sffff_sample_collector_email' ->> 'df_value')::text AS sffff_sample_collector_email,
+    (doc -> 'DFields' -> 'values' -> 'title_sffff_sample_collector' ->> 'df_value')::text AS title_sffff_sample_collector,
+    (doc -> 'DFields' -> 'values' -> 'sffff_sample_collector_address' ->> 'df_value')::text AS sffff_sample_collector_address,
+    (doc -> 'DFields' -> 'values' -> 'sffff_importer_physical_address' ->> 'df_value')::text AS sffff_importer_physical_address,
+    (doc -> 'DFields' -> 'values' -> 'sffff_sample_collector_designation' ->> 'df_value')::text AS sffff_sample_collector_designation,
+    (doc -> 'DFields' -> 'values' -> 'title_sffff_fortification_on_label' ->> 'df_value')::text AS title_sffff_fortification_on_label,
+    (doc -> 'DFields' -> 'values' -> 'sfff_presence_of_fortification_logo' ->> 'df_value')::text AS sfff_presence_of_fortification_logo,
+    (doc -> 'DFields' -> 'values' -> 'sffff_brand_name_of_sampled_product' ->> 'df_value')::text AS sffff_brand_name_of_sampled_product,
+    (doc -> 'DFields' -> 'values' -> 'sffff_sample_collector_phone_number' ->> 'df_value')::text AS sffff_sample_collector_phone_number,
+    (doc -> 'DFields' -> 'values' -> 'sffff_laboratory_sample_delivered_to' ->> 'df_value')::text AS sffff_laboratory_sample_delivered_to,
+    (doc -> 'DFields' -> 'values' -> 'sffff_laboratory_sample_receipt_date' ->> 'df_value')::text AS sffff_laboratory_sample_receipt_date,
+    (doc -> 'DFields' -> 'values' -> 'sffff_laboratory_sample_dispatch_date' ->> 'df_value')::text AS sffff_laboratory_sample_dispatch_date,
+    (doc -> 'DFields' -> 'values' -> 'sffff_date_and_time_of_sample_collection' ->> 'df_value')::text AS sffff_date_and_time_of_sample_collection,
+    (doc -> 'DFields' -> 'values' -> 'sffff_local_manufacturer_producer_address' ->> 'df_value')::text AS sffff_local_manufacturer_producer_address,
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'date_of_investigation'::text ->> 'df_value')::text AS case_investigation_date,
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'EPID'::text ->> 'df_value') AS epid,
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'disease'::text ->> 'df_value') AS disease,
+    ((doc -> 'DFields'::text) -> 'values'::text -> 'syndrome'::text ->> 'df_value') AS syndrome,
+    doc ->> 'fform_id' AS fform_id,
+    ((doc -> 'location'::text) ->> 'accuracy')::float AS location_accuracy,
+    ((doc -> 'location'::text) ->> 'latitude')::float AS location_latitude,
+    ((doc -> 'location'::text) ->> 'longitude')::float AS location_longitude,
+    doc ->> 'mform_id' AS mform_id,
+    doc ->> 'created_username' AS created_username,
+    to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS created_timestamp,
+    doc ->> 'modified_username' AS modified_username,
+    to_timestamp(doc ->> 'modified_timestamp', 'DD/MM/YYYY HH24:MI:SS') AS modified_timestamp,
+    date_part('week', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_week,
+    date_part('day', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_day,
+    date_part('month', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_month,
+    date_part('year', to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS')) AS case_year,
+    to_char(to_timestamp(doc ->> 'created_timestamp', 'DD/MM/YYYY HH24:MI:SS'), 'YYYY "W"IW') AS case_year_week,
+    doc
+FROM couchdb
+WHERE (doc ->> 'type')::text = 'dform'::text
+  AND (doc -> 'DFields' -> 'values' -> 'sffff_sample_id' ->> 'df_value') IS NOT NULL
+  AND (doc ->> 'ident') IS NOT NULL;
+
+ALTER TABLE view_dataset_sampling_form_for_fortified_foods
+OWNER TO postgres_root;
