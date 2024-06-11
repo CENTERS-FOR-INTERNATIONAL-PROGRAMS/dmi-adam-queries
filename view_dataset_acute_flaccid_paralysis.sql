@@ -1,7 +1,7 @@
 DROP VIEW IF EXISTS view_dataset_acute_flaccid_paralysis;
 CREATE VIEW view_dataset_acute_flaccid_paralysis AS
 SELECT 
-    (doc ->> 'ident')::BIGINT AS case_unique_id,
+    (doc ->> 'ident')::text AS case_unique_id,
     (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'given'::text ->> 'df_value') AS case_given_name,
     (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'family'::text ->> 'df_value') AS case_family_name,
     (((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0 -> 'DFields'::text -> 'values'::text -> 'gender'::text ->> 'df_value') AS case_gender,

@@ -1,7 +1,7 @@
 DROP VIEW IF EXISTS view_dataset_community_led_total_sanitation;
 CREATE VIEW view_dataset_community_led_total_sanitation AS
 SELECT 
-    (doc ->> 'ident')::bigint AS case_unique_id,
+    (doc ->> 'ident')::text AS case_unique_id,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'village'::text) ->> 'df_value')::text) AS village,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'sublocation_name'::text) ->> 'df_value')::text) AS sublocation_name,
     (((((doc -> 'DFields'::text) -> 'values'::text) -> 'commuity_unit'::text) ->> 'df_value')::text) AS commuity_unit,

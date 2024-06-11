@@ -1,7 +1,7 @@
 DROP VIEW IF EXISTS view_dataset_diarrhoeal_disease;
 CREATE VIEW view_dataset_diarrhoeal_disease AS
 SELECT
-    (doc ->> 'ident')::bigint AS case_unique_id,
+    (doc ->> 'ident')::text AS case_unique_id,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'given'::text) ->> 'df_value'::text AS case_given_name,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'family'::text) ->> 'df_value'::text AS case_family_name,
     ((((((doc -> 'DForms'::text) -> 'case_demographics'::text) -> 0) -> 'DFields'::text) -> 'values'::text) -> 'gender'::text) ->> 'df_value'::text AS case_gender,
